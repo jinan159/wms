@@ -1,18 +1,22 @@
 package com.teamfresh.wms.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -36,14 +40,13 @@ public class Order {
     @Column(name = "customer_name", nullable = false)
     private String customerName;
 
-    @Column(name = "address", nullable = false)
-    private String address;
+    @Embedded
+    private Address address;
 
     @Column(name = "ordered_at", nullable = false)
-    private LocalDateTime orderedAt;
+    private ZonedDateTime orderedAt;
 
-    @OneToMany
-    @JoinColumn(name = "order_id")
+    @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
     private List<OrderItem> orderItems;
 
     public enum ChannelType {
@@ -52,10 +55,47 @@ public class Order {
 
     public enum OrderStatus {
         REQUESTED,
-        ORDERED,
+        ACCEPTED,
         PENDING_SHIPMENT,
         PROCESSING_SHIPMENT,
         SHIPMENT_COMPLETED,
         SHIPMENT_CANCELLED,
+    }
+
+    @Builder(builderMethodName = "createRequestedOrder")
+    private Order(
+        ChannelType channelType,
+        String customerName,
+        Address address,
+        ZonedDateTime orderedAt
+    ) {
+        this.channelType = channelType;
+        this.status = OrderStatus.REQUESTED;
+        this.customerName = customerName;
+        this.address = address;
+        this.orderedAt = orderedAt;
+    }
+
+    public void registerOrderItems(List<OrderItem> orderItems) {
+        this.orderItems.addAll(orderItems);
+        orderItems.forEach(orderItem -> orderItem.registerOrder(this));
+    }
+
+    public Map<UUID, Long> getOrderedProductQuantityMap() {
+        Map<UUID, Long> productCounts = new HashMap<>();
+
+        for (var orderItem : orderItems) {
+            var productId = orderItem.getProductId();
+            productCounts.put(
+                productId,
+                productCounts.getOrDefault(productId, 0L) + orderItem.getQuantity()
+            );
+        }
+
+        return productCounts;
+    }
+
+    public void accepted() {
+        this.status = OrderStatus.ACCEPTED;
     }
 }

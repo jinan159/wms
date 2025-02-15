@@ -23,5 +23,25 @@ public class Product {
     private String name;
 
     @Column(nullable = false)
-    private int stockQuantity;
+    private Long stockQuantity;
+
+    public boolean isStockEnough(Long requiredQuantity) {
+        return stockQuantity >= requiredQuantity;
+    }
+
+    public ProductStockHistory orderedBy(Order order) {
+        var orderedQuantity = order.getOrderItems()
+            .stream()
+            .filter(item -> item.getProductId().equals(id))
+            .mapToLong(OrderItem::getQuantity)
+            .sum();
+
+        stockQuantity -= orderedQuantity;
+
+        return ProductStockHistory.createPendingOutboundHistory()
+            .productId(id)
+            .quantity(orderedQuantity)
+            .order(order)
+            .build();
+    }
 }
