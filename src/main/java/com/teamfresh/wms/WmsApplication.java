@@ -1,5 +1,6 @@
 package com.teamfresh.wms;
 
+import com.teamfresh.wms.infra.config.EmbeddedRedisApplicationListener;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -7,7 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class WmsApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(WmsApplication.class, args);
+        var app = new SpringApplication(WmsApplication.class);
+        app.addListeners(new EmbeddedRedisApplicationListener());
+        app.run(args);
     }
 
 }
