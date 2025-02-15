@@ -51,7 +51,8 @@ public class Order {
     }
 
     public enum OrderStatus {
-        CREATED,
+        REQUESTED,
+        ORDERED,
         PENDING_SHIPMENT,
         PROCESSING_SHIPMENT,
         SHIPMENT_COMPLETED,

@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Entity
-@Table(name = "product_stock")
-public class ProductStock {
+@Table(name = "product_stock_histories")
+public class ProductStockHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
