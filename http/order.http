@@ -1,0 +1,24 @@
+### Register Order
+
+POST http://localhost:8080/order/v1/orders
+Content-Type: application/json
+
+{
+  "orderItems": [
+    {
+      "productId": "c1d67a3b-3549-4400-a67c-86033db61814",
+      "quantity": 1
+    }
+  ],
+  "orderer": {
+    "ordererName": "홍길동",
+    "address": {
+      "postalCode": "12345",
+      "city": "성남시",
+      "district":  "수정구",
+      "streetAddress": "street-address",
+      "addressDetail":  "address-detail"
+    }
+  },
+  "channelType": "TEAM_FRESH_MALL"
+}

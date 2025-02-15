@@ -26,7 +26,7 @@ public class OrderService {
     private final LockManager lockManager;
 
     @Transactional(rollbackFor = Exception.class)
-    public UUID registerOrder(OrderRegisterRequestDto request) {
+    public UUID registerOrder(final OrderRegisterRequestDto request) {
         var order = request.toDomain();
         var orderedProductQuantityMap = order.getOrderedProductQuantityMap();
 
@@ -34,12 +34,13 @@ public class OrderService {
         var orderedProductIds = orderedProductQuantityMap.keySet();
 
         try {
-            // 락 요청
-            lockManager.productsLock(orderedProductIds);
-
-            return performRegisterOrder(
-                order,
-                orderedProductQuantityMap
+            // 락 이용하여 주문 등록 처리
+            return lockManager.useProductsLock(
+                orderedProductIds,
+                () -> performRegisterOrder(
+                    order,
+                    orderedProductQuantityMap
+                )
             );
         } catch (ApplicationException ae) {
             throw ae;
@@ -53,14 +54,14 @@ public class OrderService {
         final Order order,
         final Map<UUID, Long> orderedProductQuantityMap
     ) {
-        final var productIds = orderedProductQuantityMap.keySet();
-        final var products = productRepository.findAllById(productIds);
+        var productIds = orderedProductQuantityMap.keySet();
+        var products = productRepository.findAllById(productIds);
 
         if (products.size() != productIds.size()) {
             throw new ProductNotFoundException();
         }
 
-        final var isAllProductQuantityEnough = products.stream()
+        var isAllProductQuantityEnough = products.stream()
             .allMatch(product -> product.isStockEnough(orderedProductQuantityMap.get(product.getId())));
 
         if (!isAllProductQuantityEnough) {
@@ -68,14 +69,14 @@ public class OrderService {
         }
 
         // 주문 등록
-        final var savedOrder = orderRepository.save(order);
+        var savedOrder = orderRepository.save(order);
 
         // 상품 재고 차감
-        final var productStockHistories = products.stream()
+        var productStockHistories = products.stream()
             .map(product -> product.orderedBy(savedOrder))
             .toList();
 
-        // 주문 수락됨
+        // 주문 수락 처리
         savedOrder.accepted();
 
         // 상품 재고 차감 이력 등록

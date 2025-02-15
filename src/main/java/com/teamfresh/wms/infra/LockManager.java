@@ -2,9 +2,18 @@ package com.teamfresh.wms.infra;
 
 import java.util.Collection;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 public interface LockManager {
-    void productsLock(Collection<UUID> productIds);
+    <T> T useProductsLock(Collection<UUID> productIds, Supplier<T> innerCodeBLock);
 
-    void productsUnlock(Collection<UUID> productIds);
+    <T> T useProductsLock(Collection<UUID> productIds, LockDuration duration, Supplier<T> innerCodeBLock);
+
+    record LockDuration(
+        long waitTime,
+        long leaseTime,
+        TimeUnit timeUnit
+    ) {
+    }
 }
