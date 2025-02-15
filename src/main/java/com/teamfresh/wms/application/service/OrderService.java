@@ -1,6 +1,10 @@
 package com.teamfresh.wms.application.service;
 
 import com.teamfresh.wms.application.dto.OrderRegisterRequestDto;
+import com.teamfresh.wms.application.exception.ApplicationException;
+import com.teamfresh.wms.application.exception.OrderRegisterFailedException;
+import com.teamfresh.wms.application.exception.ProductNotFoundException;
+import com.teamfresh.wms.application.exception.ProductQuantityNotEnoughException;
 import com.teamfresh.wms.domain.Order;
 import com.teamfresh.wms.domain.OrderRepository;
 import com.teamfresh.wms.domain.ProductRepository;
@@ -21,7 +25,7 @@ public class OrderService {
     private final ProductStockHistoryRepository productStockHistoryRepository;
     private final LockManager lockManager;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public UUID registerOrder(OrderRegisterRequestDto request) {
         var order = request.toDomain();
         var orderedProductQuantityMap = order.getOrderedProductQuantityMap();
@@ -37,8 +41,10 @@ public class OrderService {
                 order,
                 orderedProductQuantityMap
             );
-        } finally {
-            lockManager.productsUnlock(orderedProductIds);
+        } catch (ApplicationException ae) {
+            throw ae;
+        } catch (Exception e) {
+            throw new OrderRegisterFailedException(e);
         }
     }
 
@@ -51,14 +57,14 @@ public class OrderService {
         final var products = productRepository.findAllById(productIds);
 
         if (products.size() != productIds.size()) {
-            throw new RuntimeException("product not found"); // TODO ProductNotFoundException
+            throw new ProductNotFoundException();
         }
 
         final var isAllProductQuantityEnough = products.stream()
             .allMatch(product -> product.isStockEnough(orderedProductQuantityMap.get(product.getId())));
 
         if (!isAllProductQuantityEnough) {
-            throw new RuntimeException("product quantity not enough"); // TODO ProductQuantityNotEnoughException
+            throw new ProductQuantityNotEnoughException();
         }
 
         // 주문 등록

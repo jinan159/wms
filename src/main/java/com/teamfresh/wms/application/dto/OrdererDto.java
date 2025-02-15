@@ -8,6 +8,6 @@ public record OrdererDto(
     String ordererName,
 
     @NotNull
-    AddressDto addressDto
+    AddressDto address
 ) {
 }

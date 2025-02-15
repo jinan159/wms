@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,6 +78,10 @@ public class Order {
     }
 
     public void registerOrderItems(List<OrderItem> orderItems) {
+        if (this.orderItems == null) {
+            this.orderItems = new ArrayList<>();
+        }
+
         this.orderItems.addAll(orderItems);
         orderItems.forEach(orderItem -> orderItem.registerOrder(this));
     }
