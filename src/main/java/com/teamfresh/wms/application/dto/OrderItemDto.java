@@ -1,6 +1,6 @@
 package com.teamfresh.wms.application.dto;
 
-import com.teamfresh.wms.domain.OrderItem;
+import com.teamfresh.wms.domain.order.OrderItem;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;

@@ -1,6 +1,6 @@
 package com.teamfresh.wms.application.dto;
 
-import com.teamfresh.wms.domain.Address;
+import com.teamfresh.wms.domain.order.Address;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 

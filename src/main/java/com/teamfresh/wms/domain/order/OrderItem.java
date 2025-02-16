@@ -1,5 +1,6 @@
-package com.teamfresh.wms.domain;
+package com.teamfresh.wms.domain.order;
 
+import com.teamfresh.wms.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

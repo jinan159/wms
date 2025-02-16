@@ -1,5 +1,8 @@
-package com.teamfresh.wms.domain;
+package com.teamfresh.wms.domain.product;
 
+import com.teamfresh.wms.domain.BaseEntity;
+import com.teamfresh.wms.domain.order.Order;
+import com.teamfresh.wms.domain.order.OrderItem;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

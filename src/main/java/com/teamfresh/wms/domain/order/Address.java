@@ -1,4 +1,4 @@
-package com.teamfresh.wms.domain;
+package com.teamfresh.wms.domain.order;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
