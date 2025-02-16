@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Table(name = "product_stock_histories")
-public class ProductStockHistory {
+public class ProductStockHistory extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

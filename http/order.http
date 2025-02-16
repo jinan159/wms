@@ -6,8 +6,12 @@ Content-Type: application/json
 {
   "orderItems": [
     {
-      "productId": "c1d67a3b-3549-4400-a67c-86033db61814",
+      "productId": "ac5720dc-90fb-4891-aa9d-910248f9fd25",
       "quantity": 1
+    },
+    {
+      "productId": "6efce639-3a34-46e0-9658-24f3e8d502be",
+      "quantity": 2
     }
   ],
   "orderer": {
