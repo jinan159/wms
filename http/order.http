@@ -26,3 +26,15 @@ Content-Type: application/json
   },
   "channelType": "TEAM_FRESH_MALL"
 }
+
+### Upload Order
+
+POST http://localhost:8080/order/v1/orders/upload
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="file"; filename="orders.xlsx"
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+< ../orders.xlsx
+------Boundary--

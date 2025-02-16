@@ -6,8 +6,10 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import java.util.List;
+import lombok.Builder;
 
-public record OrderRegisterRequestDto(
+@Builder
+public record OrderCreateRequestDto(
     @NotEmpty
     List<@Valid OrderItemDto> orderItems,
 

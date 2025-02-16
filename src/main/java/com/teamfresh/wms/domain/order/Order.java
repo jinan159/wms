@@ -52,7 +52,7 @@ public class Order extends BaseEntity {
     private ZonedDateTime orderedAt;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
-    private List<OrderItem> orderItems;
+    private final List<OrderItem> orderItems = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.PERSIST)
     @JoinTable(
@@ -90,10 +90,6 @@ public class Order extends BaseEntity {
     }
 
     public void registerOrderItems(List<OrderItem> orderItems) {
-        if (this.orderItems == null) {
-            this.orderItems = new ArrayList<>();
-        }
-
         this.orderItems.addAll(orderItems);
         orderItems.forEach(orderItem -> orderItem.registerOrder(this));
     }

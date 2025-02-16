@@ -1,14 +1,19 @@
 package com.teamfresh.wms.presentation.controller;
 
-import com.teamfresh.wms.application.dto.OrderRegisterRequestDto;
+import com.teamfresh.wms.application.dto.OrderCreateRequestDto;
+import com.teamfresh.wms.application.dto.OrderUploadRequestDto;
 import com.teamfresh.wms.application.service.OrderService;
-import com.teamfresh.wms.presentation.dto.OrderRegisteredResponseDto;
+import com.teamfresh.wms.presentation.dto.OrderCreateResponseDto;
+import com.teamfresh.wms.presentation.dto.OrderUploadResponseDto;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/order/v1/orders")
@@ -17,11 +22,20 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public OrderRegisteredResponseDto register(
-        @RequestBody @Valid OrderRegisterRequestDto requestBody
+    public OrderCreateResponseDto create(
+        @RequestBody @Valid OrderCreateRequestDto requestBody
     ) {
-        return new OrderRegisteredResponseDto(
-            orderService.register(requestBody)
+        return new OrderCreateResponseDto(
+            orderService.createOrder(requestBody)
+        );
+    }
+
+    @PostMapping("/upload")
+    public OrderUploadResponseDto upload(@RequestPart MultipartFile file) throws IOException {
+        return new OrderUploadResponseDto(
+            orderService.uploadOrders(
+                new OrderUploadRequestDto(file.getInputStream())
+            )
         );
     }
 }
