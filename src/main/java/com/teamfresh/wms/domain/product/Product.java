@@ -31,15 +31,20 @@ public class Product extends BaseEntity {
         return stockQuantity >= requiredQuantity;
     }
 
-    public ProductStockHistory decreaseStock(
-        long quantity,
-        ProductStockHistory.ProductStockHistoryType type
-    ) {
+    public void decreaseStock(long quantity) {
         if (!isStockEnough(quantity)) {
             throw new IllegalArgumentException("재고가 부족합니다.");
         }
 
         stockQuantity -= quantity;
+    }
+
+
+    public ProductStockHistory decreaseStockWithHistory(
+        long quantity,
+        ProductStockHistory.ProductStockHistoryType type
+    ) {
+        decreaseStock(quantity);
 
         if (Objects.requireNonNull(type) == ProductStockHistory.ProductStockHistoryType.PENDING_OUTBOUND) {
             return ProductStockHistory.createPendingOutboundHistory()

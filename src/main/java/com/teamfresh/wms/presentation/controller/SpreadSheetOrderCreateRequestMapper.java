@@ -1,4 +1,4 @@
-package com.teamfresh.wms.application.service;
+package com.teamfresh.wms.presentation.controller;
 
 import com.teamfresh.wms.application.dto.AddressDto;
 import com.teamfresh.wms.application.dto.OrderCreateRequestDto;
@@ -6,34 +6,27 @@ import com.teamfresh.wms.application.dto.OrderItemDto;
 import com.teamfresh.wms.application.dto.OrdererDto;
 import com.teamfresh.wms.domain.order.Order;
 import com.teamfresh.wms.infra.document.SpreadSheetDocument;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.Builder;
 
 public class SpreadSheetOrderCreateRequestMapper {
-    public List<OrderCreateRequestDto> map(SpreadSheetDocument document) {
-        var firstSheet = document.get(0);
+    public MappingResult map(SpreadSheetDocument document) {
+        var productQuantityMap = new HashMap<UUID, Long>();
+        var uploadedOrders = mapToUploadedOrders(document);
 
-        var uploadedRows = firstSheet.rows()
-            .stream()
-            .skip(1) // 헤더 제외
-            .map(row -> UploadedOrderRow.builder()
-                .orderGroupCode(row.get(0).value())
-                .channelType(row.get(1).value())
-                .ordererName(row.get(2).value())
-                .postalCode(row.get(3).value())
-                .city(row.get(4).value())
-                .district(row.get(5).value())
-                .streetAddress(row.get(6).value())
-                .detailAddress(row.get(7).value())
-                .productId(row.get(8).value())
-                .quantity(row.get(9).value())
-                .build()
+        uploadedOrders.forEach(row ->
+            productQuantityMap.merge(
+                UUID.fromString(row.productId),
+                Long.parseLong(row.quantity),
+                Long::sum
             )
-            .toList();
+        );
 
-        var groupedRows = uploadedRows.stream()
+        var groupedRows = uploadedOrders.stream()
             .collect(
                 Collectors.groupingBy(
                     row -> row.orderGroupCode,
@@ -44,7 +37,7 @@ public class SpreadSheetOrderCreateRequestMapper {
                 )
             );
 
-        return groupedRows.values().stream()
+        var orderCreateRequests = groupedRows.values().stream()
             .map(rows -> {
                 var orderItems = rows.stream()
                     .map(row -> new OrderItemDto(
@@ -76,6 +69,33 @@ public class SpreadSheetOrderCreateRequestMapper {
                     .build();
             })
             .toList();
+
+        return new MappingResult(
+            orderCreateRequests,
+            productQuantityMap
+        );
+    }
+
+    private List<UploadedOrderRow> mapToUploadedOrders(SpreadSheetDocument document) {
+        var firstSheet = document.get(0);
+
+        return firstSheet.rows()
+            .stream()
+            .skip(1) // 헤더 제외
+            .map(row -> UploadedOrderRow.builder()
+                .orderGroupCode(row.get(0).value())
+                .channelType(row.get(1).value())
+                .ordererName(row.get(2).value())
+                .postalCode(row.get(3).value())
+                .city(row.get(4).value())
+                .district(row.get(5).value())
+                .streetAddress(row.get(6).value())
+                .detailAddress(row.get(7).value())
+                .productId(row.get(8).value())
+                .quantity(row.get(9).value())
+                .build()
+            )
+            .toList();
     }
 
     @Builder
@@ -90,6 +110,12 @@ public class SpreadSheetOrderCreateRequestMapper {
         String detailAddress,
         String productId,
         String quantity
+    ) {
+    }
+
+    public record MappingResult(
+        List<OrderCreateRequestDto> orderCreateRequests,
+        Map<UUID, Long> productQuantityMap
     ) {
     }
 }

@@ -1,8 +1,14 @@
 package com.teamfresh.wms.application.dto;
 
-import java.io.InputStream;
+import jakarta.validation.constraints.NotEmpty;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public record OrderUploadRequestDto(
-    InputStream inputStream
+    @NotEmpty
+    List<OrderCreateRequestDto> orderCreateRequests,
+    @NotEmpty
+    Map<UUID, Long> productQuantityMap
 ) {
 }

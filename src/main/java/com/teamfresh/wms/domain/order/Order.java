@@ -1,7 +1,6 @@
 package com.teamfresh.wms.domain.order;
 
 import com.teamfresh.wms.domain.BaseEntity;
-import com.teamfresh.wms.domain.product.ProductStockHistory;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -11,8 +10,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.ZonedDateTime;
@@ -54,13 +51,8 @@ public class Order extends BaseEntity {
     @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
     private final List<OrderItem> orderItems = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.PERSIST)
-    @JoinTable(
-        name = "order_product_stock_histories",
-        joinColumns = @JoinColumn(name = "order_id"),
-        inverseJoinColumns = @JoinColumn(name = "product_stock_history_id")
-    )
-    private final List<ProductStockHistory> productStockHistories = new ArrayList<>();
+    @Column(name = "order_group_code")
+    private UUID orderGroupCode;
 
     public enum ChannelType {
         TEAM_FRESH_MALL
@@ -108,10 +100,15 @@ public class Order extends BaseEntity {
         return productCounts;
     }
 
-    public void accept(
-        List<ProductStockHistory> productStockHistories
-    ) {
+    public void accept() {
         this.status = OrderStatus.ACCEPTED;
-        this.productStockHistories.addAll(productStockHistories);
+    }
+
+    public void assignOrderGroupCode(UUID orderGroupCode) {
+        if (this.orderGroupCode != null) {
+            throw new IllegalStateException("이미 그룹 코드가 할당된 주문입니다.");
+        }
+
+        this.orderGroupCode = orderGroupCode;
     }
 }

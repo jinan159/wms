@@ -3,6 +3,7 @@ package com.teamfresh.wms.presentation.controller;
 import com.teamfresh.wms.application.dto.OrderCreateRequestDto;
 import com.teamfresh.wms.application.dto.OrderUploadRequestDto;
 import com.teamfresh.wms.application.service.OrderService;
+import com.teamfresh.wms.infra.document.SpreadSheetParser;
 import com.teamfresh.wms.presentation.dto.OrderCreateResponseDto;
 import com.teamfresh.wms.presentation.dto.OrderUploadResponseDto;
 import jakarta.validation.Valid;
@@ -19,11 +20,14 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/order/v1/orders")
 @RequiredArgsConstructor
 public class OrderController {
+    private static final SpreadSheetOrderCreateRequestMapper spreadSheetOrderCreateRequestMapper = new SpreadSheetOrderCreateRequestMapper();
+
     private final OrderService orderService;
+    private final SpreadSheetParser spreadSheetParser;
 
     @PostMapping
     public OrderCreateResponseDto create(
-        @RequestBody @Valid OrderCreateRequestDto requestBody
+        @RequestBody OrderCreateRequestDto requestBody
     ) {
         return new OrderCreateResponseDto(
             orderService.createOrder(requestBody)
@@ -31,10 +35,17 @@ public class OrderController {
     }
 
     @PostMapping("/upload")
-    public OrderUploadResponseDto upload(@RequestPart MultipartFile file) throws IOException {
+    public OrderUploadResponseDto upload(@RequestPart MultipartFile file) throws IOException {;
+        var mappingResult = spreadSheetOrderCreateRequestMapper.map(
+            spreadSheetParser.parse(file.getInputStream())
+        );
+
         return new OrderUploadResponseDto(
             orderService.uploadOrders(
-                new OrderUploadRequestDto(file.getInputStream())
+                new OrderUploadRequestDto(
+                    mappingResult.orderCreateRequests(),
+                    mappingResult.productQuantityMap()
+                )
             )
         );
     }

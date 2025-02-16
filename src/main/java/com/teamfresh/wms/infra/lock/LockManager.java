@@ -1,4 +1,4 @@
-package com.teamfresh.wms.infra;
+package com.teamfresh.wms.infra.lock;
 
 import java.util.Collection;
 import java.util.UUID;

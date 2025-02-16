@@ -1,4 +1,4 @@
-package com.teamfresh.wms.infra;
+package com.teamfresh.wms.infra.lock;
 
 import com.teamfresh.wms.infra.exception.LockAcquireFailedException;
 import java.util.ArrayList;
