@@ -18,7 +18,7 @@ public record OrderRegisterRequestDto(
     Order.ChannelType channelType
 ) {
     public Order toDomain() {
-        var orderDomain = Order.createRequestedOrder()
+        var orderDomain = Order.createRegisteredOrder()
             .channelType(Order.ChannelType.TEAM_FRESH_MALL) // 가상의 주문 채널값을 넣어줌
             .customerName(orderer.ordererName())
             .address(orderer().address().toDomain())

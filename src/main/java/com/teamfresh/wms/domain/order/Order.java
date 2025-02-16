@@ -56,7 +56,7 @@ public class Order extends BaseEntity {
     }
 
     public enum OrderStatus {
-        REQUESTED,
+        REGISTERED,
         ACCEPTED,
         PENDING_SHIPMENT,
         PROCESSING_SHIPMENT,
@@ -64,7 +64,7 @@ public class Order extends BaseEntity {
         SHIPMENT_CANCELLED,
     }
 
-    @Builder(builderMethodName = "createRequestedOrder")
+    @Builder(builderMethodName = "createRegisteredOrder")
     private Order(
         ChannelType channelType,
         String customerName,
@@ -72,7 +72,7 @@ public class Order extends BaseEntity {
         ZonedDateTime orderedAt
     ) {
         this.channelType = channelType;
-        this.status = OrderStatus.REQUESTED;
+        this.status = OrderStatus.REGISTERED;
         this.customerName = customerName;
         this.address = address;
         this.orderedAt = orderedAt;
