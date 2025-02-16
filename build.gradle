@@ -41,6 +41,11 @@ dependencies {
     implementation 'com.github.codemonstur:embedded-redis:1.4.3'
     implementation 'org.redisson:redisson-spring-boot-starter:3.44.0'
 
+    // Document parsing
+    implementation 'org.apache.poi:poi:5.4.0'
+    implementation 'org.apache.poi:poi-ooxml:5.4.0'
+
+
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
