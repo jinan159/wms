@@ -1,17 +1,13 @@
 package com.teamfresh.wms.domain.product;
 
 import com.teamfresh.wms.domain.BaseEntity;
-import com.teamfresh.wms.domain.order.Order;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.Builder;
@@ -37,10 +33,6 @@ public class ProductStockHistory extends BaseEntity {
     @Column(name = "quantity", nullable = false)
     private long quantity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    private Order order;
-
     public enum ProductStockHistoryType {
         INBOUND,
         PENDING_OUTBOUND,
@@ -51,12 +43,10 @@ public class ProductStockHistory extends BaseEntity {
     @Builder(builderMethodName = "createPendingOutboundHistory")
     private ProductStockHistory(
         UUID productId,
-        long quantity,
-        Order order
+        long quantity
     ) {
         this.productId = productId;
         this.type = ProductStockHistoryType.PENDING_OUTBOUND;
         this.quantity = quantity;
-        this.order = order;
     }
 }

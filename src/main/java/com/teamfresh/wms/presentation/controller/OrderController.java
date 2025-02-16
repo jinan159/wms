@@ -17,11 +17,11 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public OrderRegisteredResponseDto registerOrder(
+    public OrderRegisteredResponseDto register(
         @RequestBody @Valid OrderRegisterRequestDto requestBody
     ) {
         return new OrderRegisteredResponseDto(
-            orderService.registerOrder(requestBody)
+            orderService.register(requestBody)
         );
     }
 }

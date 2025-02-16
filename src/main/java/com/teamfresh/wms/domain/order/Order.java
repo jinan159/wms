@@ -1,6 +1,7 @@
 package com.teamfresh.wms.domain.order;
 
 import com.teamfresh.wms.domain.BaseEntity;
+import com.teamfresh.wms.domain.product.ProductStockHistory;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -10,6 +11,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.ZonedDateTime;
@@ -50,6 +53,14 @@ public class Order extends BaseEntity {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
     private List<OrderItem> orderItems;
+
+    @OneToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(
+        name = "order_product_stock_histories",
+        joinColumns = @JoinColumn(name = "order_id"),
+        inverseJoinColumns = @JoinColumn(name = "product_stock_history_id")
+    )
+    private final List<ProductStockHistory> productStockHistories = new ArrayList<>();
 
     public enum ChannelType {
         TEAM_FRESH_MALL
@@ -101,7 +112,10 @@ public class Order extends BaseEntity {
         return productCounts;
     }
 
-    public void accepted() {
+    public void accept(
+        List<ProductStockHistory> productStockHistories
+    ) {
         this.status = OrderStatus.ACCEPTED;
+        this.productStockHistories.addAll(productStockHistories);
     }
 }

@@ -1,14 +1,13 @@
 package com.teamfresh.wms.domain.product;
 
 import com.teamfresh.wms.domain.BaseEntity;
-import com.teamfresh.wms.domain.order.Order;
-import com.teamfresh.wms.domain.order.OrderItem;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,19 +31,23 @@ public class Product extends BaseEntity {
         return stockQuantity >= requiredQuantity;
     }
 
-    public ProductStockHistory orderedBy(Order order) {
-        var orderedQuantity = order.getOrderItems()
-            .stream()
-            .filter(item -> item.getProductId().equals(id))
-            .mapToLong(OrderItem::getQuantity)
-            .sum();
+    public ProductStockHistory decreaseStock(
+        long quantity,
+        ProductStockHistory.ProductStockHistoryType type
+    ) {
+        if (!isStockEnough(quantity)) {
+            throw new IllegalArgumentException("재고가 부족합니다.");
+        }
 
-        stockQuantity -= orderedQuantity;
+        stockQuantity -= quantity;
 
-        return ProductStockHistory.createPendingOutboundHistory()
-            .productId(id)
-            .quantity(orderedQuantity)
-            .order(order)
-            .build();
+        if (Objects.requireNonNull(type) == ProductStockHistory.ProductStockHistoryType.PENDING_OUTBOUND) {
+            return ProductStockHistory.createPendingOutboundHistory()
+                .productId(id)
+                .quantity(quantity)
+                .build();
+        }
+
+        throw new UnsupportedOperationException();
     }
 }
